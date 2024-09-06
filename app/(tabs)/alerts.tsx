@@ -1,23 +1,74 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Pressable, Animated } from "react-native";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useState, useRef, useEffect } from "react";
 
-const AlertItem = ({ title, description, isExpanded }: { title: string; description: string; isExpanded: boolean }) => (
-    <View style={styles.alertItem}>
-        <Image source={require("../../assets/images/fire_square.png")} style={styles.alertIcon} />
-        <View style={styles.alertContent}>
-            <Text style={styles.alertTitle}>{title}</Text>
-            <Text style={styles.alertDescription}>{description}</Text>
+const AlertItem = ({ title, description, icon }: { title: string; description: string; icon: any }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const animatedHeight = useRef(new Animated.Value(0)).current;
+    const animatedRotation = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        Animated.parallel([
+            Animated.timing(animatedHeight, {
+                toValue: isExpanded ? 1 : 0,
+                duration: 500,
+                useNativeDriver: false,
+            }),
+            Animated.timing(animatedRotation, {
+                toValue: isExpanded ? 1 : 0,
+                duration: 400,
+                useNativeDriver: true,
+            })
+        ]).start();
+    }, [isExpanded]);
+
+    const maxHeight = animatedHeight.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 100], // Adjust this value based on your content height
+    });
+
+    const rotateZ = animatedRotation.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '180deg'],
+    });
+
+    return (
+        <View style={styles.alertItem}>
+            <Pressable onPress={() => setIsExpanded(!isExpanded)} style={styles.alertHeader}>
+                <Image source={icon} style={styles.alertIcon} />
+                <View style={styles.alertContent}>
+                    <Text style={styles.alertTitle}>{title}</Text>
+                    <Text style={styles.alertDescription}>{description}</Text>
+                </View>
+                <Animated.View style={{ transform: [{ rotateZ }] }}>
+                    <Ionicons name="chevron-down" size={24} color="#000" />
+                </Animated.View>
+            </Pressable>
+
+            <Animated.View style={[styles.expandedContent, { maxHeight }]}>
+                <Text style={styles.expandedContentText}>Ocorrência em análise</Text>
+                <View style={styles.overlayButtonsContainer}>
+                    <TouchableOpacity style={styles.overlayButton}>
+                        <Ionicons name="thumbs-up" size={24} color="#fff" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.overlayButton}>
+                        <Ionicons name="time" size={24} color="#fff" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.overlayButton}>
+                        <Image source={require("../../assets/images/status_icon.png")} style={styles.buttonIcon} />
+                    </TouchableOpacity>
+                </View>
+            </Animated.View>
         </View>
-        <FontAwesome name={isExpanded ? "chevron-up" : "chevron-down"} size={24} color="#000" />
-    </View>
-);
+    );
+};
 
 const FilterButton = ({ title }: { title: string }) => (
     <TouchableOpacity style={styles.filterButton}>
         <Text style={styles.filterButtonText}>{title}</Text>
-        <FontAwesome name="chevron-down" size={24} color="#000" />
+        <Ionicons name="chevron-down" size={20} color="#000" />
     </TouchableOpacity>
 );
 
@@ -37,7 +88,7 @@ export default function AlertsScreen() {
                 </View>
 
                 <View style={styles.tabContainer}>
-                    <TouchableOpacity style={styles.tabButton}>
+                    <TouchableOpacity style={[styles.tabButton, { paddingLeft: 10 }]}>
                         <Text style={styles.tabButtonText}>Todos os alertas</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.tabButton}>
@@ -55,15 +106,18 @@ export default function AlertsScreen() {
                 </View>
 
                 <ScrollView style={styles.alertList}>
-                    <AlertItem title="Av. João Davino" description="Incêndio na Avenida João Davino, próximo a Maple Bear." isExpanded={false} />
-                    <AlertItem title="Av. João Davino" description="Tornado na Avenida João Davino, próximo a Maple Bear." isExpanded={false} />
-                    <AlertItem title="Av. João Davino" description="Incêndio na Avenida João Davino, próximo a Maple Bear." isExpanded={false} />
-                    <AlertItem title="Av. João Davino" description="Alagamento na Avenida João Davino, próximo a Maple Bear." isExpanded={true} />
-                    <AlertItem title="Av. João Davino" description="Incêndio na Avenida João Davino, próximo a Maple Bear." isExpanded={false} />
+                    <AlertItem title="Av. Fernandes Lima" description="Incêndio na Avenida Fernandes Lima, próximo ao Shopping Pátio Maceió." icon={require("../../assets/images/fire_square.png")} />
+                    <AlertItem title="Rua Sá e Albuquerque" description="Tornado na Rua Sá e Albuquerque, região do Jaraguá." icon={require("../../assets/images/tornado_square.png")} />
+                    <AlertItem title="Av. C. Gustavo Paiva" description="Alagamento na Avenida Comendador Gustavo Paiva, próximo ao Maceió Shopping." icon={require("../../assets/images/rain_square.png")} />
+                    <AlertItem title="Av. Durval de Góes Monteiro" description="Incêndio na Avenida Durval de Góes Monteiro, próximo à praia de Jatiúca." icon={require("../../assets/images/fire_square.png")} />
+                    <AlertItem title="Rua Jangadeiros Alagoanos" description="Tornado na Rua Jangadeiros Alagoanos, região da Ponta Verde." icon={require("../../assets/images/tornado_square.png")} />
+                    <AlertItem title="Av. Álvaro Otacílio" description="Alagamento na Avenida Álvaro Otacílio, orla da Ponta Verde." icon={require("../../assets/images/rain_square.png")} />
+                    <AlertItem title="Rua Jangadeiros Alagoanos" description="Tornado na Rua Jangadeiros Alagoanos, região da Ponta Verde." icon={require("../../assets/images/tornado_square.png")} />
+                    <AlertItem title="Rua Antônio Vieira Filho" description="Incêndio na Rua Antônio Vieira Filho, próximo ao Shopping Pátio Maceió." icon={require("../../assets/images/fire_square.png")} />
                 </ScrollView>
             </View>
             <View style={styles.bottomNavBar}>
-                <TouchableOpacity style={styles.navBarItem}>
+                <TouchableOpacity style={styles.navBarItem} onPress={() => router.push("/")}>
                     <FontAwesome name="map" size={34} color="#828181" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navBarItem} onPress={() => router.push("/alerts")}>
@@ -81,6 +135,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         marginHorizontal: 24,
+        marginBottom: 59,
     },
     header: {
         flexDirection: "row",
@@ -111,10 +166,9 @@ const styles = StyleSheet.create({
         justifyContent: "space-around",
         backgroundColor: "#FFF",
         borderRadius: 12,
-        paddingHorizontal: 8,
     },
     tabButton: {
-        paddingHorizontal: 10,
+        paddingRight: 15,
         marginVertical: 8,
         borderRightWidth: 1,
         borderRightColor: "#E0E0E0",
@@ -131,11 +185,14 @@ const styles = StyleSheet.create({
         backgroundColor: "#FFF",
         borderRadius: 12,
         padding: 8,
-        marginTop: 10,
+        marginVertical: 10,
     },
     filterButton: {
-        padding: 8,
+        padding: 4,
         borderRadius: 4,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
     },
     filterButtonText: {
         color: "#000",
@@ -143,17 +200,43 @@ const styles = StyleSheet.create({
     alertList: {
         flex: 1,
         backgroundColor: "#FFF",
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
     },
     alertItem: {
-        flexDirection: "row",
-        alignItems: "center",
-        padding: 16,
         borderBottomWidth: 1,
         borderBottomColor: "#E0E0E0",
     },
-    alertIcon: {
+    alertHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+        padding: 16,
+    },
+    expandedContent: {
+        overflow: "hidden",
+    },
+    overlayButtonsContainer: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        marginTop: 10,
+        marginBottom: 16,
+    },
+    overlayButton: {
         width: 40,
         height: 40,
+        backgroundColor: "#FAA74A",
+        borderRadius: 20,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    buttonIcon: {
+        width: 30,
+        height: 30,
+        resizeMode: "contain",
+    },
+    alertIcon: {
+        width: 50,
+        height: 50,
         marginRight: 16,
     },
     alertContent: {
@@ -192,5 +275,11 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.58,
         shadowRadius: 16,
         elevation: 24,
+    },
+    expandedContentText: {
+        fontSize: 14,
+        fontWeight: "300",
+        color: "#303030",
+        paddingLeft: 16,
     },
 });
