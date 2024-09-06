@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Image, TouchableOpacity, Text, Animated } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Text, Animated, Image } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"; // Import MapView and Marker
+import { useRouter } from "expo-router";
 
 const fabShadow = {
     shadowColor: "#000",
@@ -12,6 +14,17 @@ const fabShadow = {
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
+};
+
+const overlayShadow = {
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 0,
+        height: 8,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 2,
+    elevation: 20,
 };
 
 interface OverlayProps {
@@ -34,16 +47,18 @@ const Overlay: React.FC<OverlayProps> = ({ title, description, icon, onClose, vi
     }, [visible]);
 
     return (
-        <Animated.View style={[styles.overlay, fabShadow, { transform: [{ translateY: animation }] }]}>
+        <Animated.View style={[styles.overlay, overlayShadow, { transform: [{ translateY: animation }] }]}>
             <View style={styles.overlayContent}>
                 <Image source={icon} style={styles.overlayIcon} />
                 <View style={styles.overlayTextContainer}>
-                    <Text style={styles.overlayTitle}>{title}</Text>
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.overlayTitle}>{title}</Text>
+                        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                            <Ionicons name="close" size={24} color="#828181" />
+                        </TouchableOpacity>
+                    </View>
                     <Text style={styles.overlayDescription}>{description}</Text>
                 </View>
-                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                    <FontAwesome name="close" size={24} color="#828181" />
-                </TouchableOpacity>
             </View>
             <View style={styles.overlayButtonsContainer}>
                 <TouchableOpacity style={styles.overlayButton}>
@@ -61,12 +76,29 @@ const Overlay: React.FC<OverlayProps> = ({ title, description, icon, onClose, vi
 };
 
 export default function App() {
+  const router = useRouter();
+  
     const [showRainOverlay, setShowRainOverlay] = useState(false);
     const [showFireOverlay, setShowFireOverlay] = useState(false);
 
+    const initialRegion = {
+        latitude: -9.6498, // Approximate latitude for Maceió, Brazil
+        longitude: -35.7089, // Approximate longitude for Maceió, Brazil
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+    };
+
     return (
         <View style={styles.container}>
-            <Image source={require("../../assets/images/map.png")} style={styles.mapBackground} />
+            <MapView provider={PROVIDER_GOOGLE} style={styles.mapBackground} initialRegion={initialRegion}>
+                <Marker coordinate={{ latitude: -9.6398, longitude: -35.7189 }} onPress={() => setShowRainOverlay(true)}>
+                    <Image source={require("../../assets/images/rain.png")} style={{ width: 30, height: 30 }} />
+                </Marker>
+
+                <Marker coordinate={{ latitude: -9.6598, longitude: -35.6989 }} onPress={() => setShowFireOverlay(true)}>
+                    <Image source={require("../../assets/images/fire.png")} style={{ width: 30, height: 30 }} />
+                </Marker>
+            </MapView>
 
             <TouchableOpacity style={[styles.centerMapButton, fabShadow]}>
                 <FontAwesome name="crosshairs" size={30} color="#828181" />
@@ -80,19 +112,11 @@ export default function App() {
                 <FontAwesome name="bars" size={26} color="#828181" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.iconContainer, { top: 300, left: 200 }]} onPress={() => setShowRainOverlay(true)}>
-                <Image source={require("../../assets/images/rain.png")} style={styles.largeIcon} />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.iconContainer, { top: 400, left: 150 }]} onPress={() => setShowFireOverlay(true)}>
-                <Image source={require("../../assets/images/fire.png")} style={styles.largeIcon} />
-            </TouchableOpacity>
-
             <View style={styles.bottomNavBar}>
                 <TouchableOpacity style={styles.navBarItem}>
-                    <FontAwesome name="map" size={34} color="#FF7B00" />
+                    <FontAwesome name="map" size={34} color="#FAA74A" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navBarItem}>
+                <TouchableOpacity style={styles.navBarItem} onPress={() => router.push('/alerts')}>
                     <FontAwesome name="exclamation-triangle" size={34} color="#828181" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navBarItem}>
@@ -128,8 +152,6 @@ const styles = StyleSheet.create({
     },
     mapBackground: {
         ...StyleSheet.absoluteFillObject,
-        width: "100%",
-        height: "100%",
     },
     bottomNavBar: {
         position: "absolute",
@@ -150,7 +172,7 @@ const styles = StyleSheet.create({
     centerMapButton: {
         position: "absolute",
         bottom: 80,
-        right: 15,
+        right: 20,
         backgroundColor: "white",
         borderRadius: 100000,
         padding: 12,
@@ -173,13 +195,6 @@ const styles = StyleSheet.create({
         padding: 14,
         paddingHorizontal: 15,
     },
-    iconContainer: {
-        position: "absolute",
-    },
-    largeIcon: {
-        width: 50,
-        height: 50,
-    },
     overlay: {
         position: "absolute",
         top: 0,
@@ -196,8 +211,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     overlayIcon: {
-        width: 70,
-        height: 70,
         marginRight: 10,
         marginLeft: 26,
     },
@@ -233,5 +246,10 @@ const styles = StyleSheet.create({
         width: 30,
         height: 30,
         resizeMode: "contain",
+    },
+    titleContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
 });
