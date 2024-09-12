@@ -119,7 +119,7 @@ export default function App() {
                 <TouchableOpacity style={styles.navBarItem} onPress={() => router.push('/alerts')}>
                     <FontAwesome name="exclamation-triangle" size={34} color="#828181" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navBarItem}>
+                <TouchableOpacity style={styles.navBarItem} onPress={() => router.push('/auth/login')}>
                     <FontAwesome name="file-text" size={34} color="#828181" />
                 </TouchableOpacity>
             </View>
