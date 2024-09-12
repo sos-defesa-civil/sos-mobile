@@ -5,50 +5,50 @@ import { Ionicons } from "@expo/vector-icons";
 const LoginScreen = () => {
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-
-                <View style={styles.logoAndTitle}>
-                    <Image source={require("../../assets/images/logo_defesa_civil.jpg")} style={styles.logo} />
-                    <View>
-                        <Text style={styles.title}>Bem-vindo ao SOS Defesa Civil Alagoas</Text>
+            <View style={styles.contentContainer}>
+                <View style={styles.header}>
+                    <View style={styles.logoAndTitle}>
+                        <Image source={require("../../assets/images/logo_defesa_civil.jpg")} style={styles.logo} />
+                        <View>
+                            <Text style={styles.title}>Bem-vindo ao SOS Defesa Civil Alagoas</Text>
+                        </View>
                     </View>
+                    <Text style={styles.subtitle}>Monitore alertas de desastres e proteja sua comunidade.</Text>
                 </View>
 
-                <Text style={styles.subtitle}>Monitore alertas de desastres e proteja sua comunidade.</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Endereço de Email"
+                    placeholderTextColor="#777"
+                    keyboardType="email-address"
+                />
+
+
+                <TouchableOpacity style={styles.continueButton}>
+                    <Text style={styles.buttonText}>Continuar</Text>
+                </TouchableOpacity>
+
+                <Text style={styles.registerText}>
+                    Não possui conta? <Text style={styles.registerLink}>Clique aqui</Text>
+                </Text>
+
+
+                <View style={styles.dividerContainer}>
+                    <View style={styles.line} />
+                    <Text style={styles.orText}>ou</Text>
+                    <View style={styles.line} />
+                </View>
+
+                <TouchableOpacity style={styles.socialButton}>
+                    <Ionicons name="mail-outline" size={24} color="#000" />
+                    <Text style={styles.socialButtonText}>Continuar com o Email</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.socialButtonGoogle}>
+                    <Ionicons name="logo-google" size={24} color="#000" />
+                    <Text style={styles.socialButtonText}>Continuar com Google</Text>
+                </TouchableOpacity>
             </View>
-
-            <TextInput
-                style={styles.input}
-                placeholder="Endereço de Email"
-                placeholderTextColor="#777"
-                keyboardType="email-address"
-            />
-
-
-            <TouchableOpacity style={styles.continueButton}>
-                <Text style={styles.buttonText}>Continuar</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.registerText}>
-                Não possui conta? <Text style={styles.registerLink}>Clique aqui</Text>
-            </Text>
-
-
-            <View style={styles.dividerContainer}>
-                <View style={styles.line} />
-                <Text style={styles.orText}>ou</Text>
-                <View style={styles.line} />
-            </View>
-
-            <TouchableOpacity style={styles.socialButton}>
-                <Ionicons name="mail-outline" size={24} color="#000" />
-                <Text style={styles.socialButtonText}>Continuar com o Email</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.socialButtonGoogle}>
-                <Ionicons name="logo-google" size={24} color="#000" />
-                <Text style={styles.socialButtonText}>Continuar com Google</Text>
-            </TouchableOpacity>
 
 
             <View style={styles.footerContainer}>
@@ -72,10 +72,15 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         backgroundColor: '#fff',
     },
+    contentContainer: {
+        flex: 1,
+        justifyContent: 'center',
+    },
     header: {
         position: 'relative',
         alignItems: 'center',
         marginBottom: 20,
+        paddingBottom: 64,
     },
     closeButton: {
         position: 'absolute',
@@ -96,12 +101,12 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     title: {
-        fontSize: 18,
+        fontSize: 24,
         fontWeight: 'bold',
-        textAlign: 'left',
+        textAlign: 'center',
     },
     subtitle: {
-        fontSize: 14,
+        fontSize: 16,
         textAlign: 'center',
         color: '#555',
         marginBottom: 20,
