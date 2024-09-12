@@ -1,4 +1,3 @@
-// src/screens/LoginScreen.js
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import {Ionicons } from "@expo/vector-icons";
@@ -53,9 +52,12 @@ const LoginScreen = () => {
 
 
       <View style={styles.footerContainer}>
-      <Text style={styles.footerText}>
-        Ao continuar, você concorda com os <Text style={styles.linkText}>Termos de Serviço</Text> e <Text style={styles.linkText}>Política de Privacidade</Text>.
-      </Text>
+      <Text style={styles.termsText}>
+                Ao utilizar, você concorda com os
+                <Text style={{ fontWeight: 'bold' }}> Termos de Serviço </Text>
+                e a
+                <Text style={{ fontWeight: 'bold' }}> Política de Privacidade</Text>.
+    </Text>
       </View>
     </View>
   );
@@ -174,11 +176,11 @@ const styles = StyleSheet.create({
   footerContainer: {
     paddingTop: 50,  
   },
-  footerText: {
+  termsText: {
+    fontFamily: 'SpaceGrotesk_400Regular',
     textAlign: 'center',
-    color: '#999',
-    marginTop: 70,
-  },
+    marginBottom: 8,
+},
   linkText: {
     color: '#272C6B',
     fontWeight: 'bold',
