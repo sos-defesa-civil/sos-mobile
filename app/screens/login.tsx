@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 
 const LoginScreen = () => {
     return (
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.contentContainer}>
                 <View style={styles.header}>
                     <View style={styles.logoAndTitle}>
@@ -23,7 +23,6 @@ const LoginScreen = () => {
                     keyboardType="email-address"
                 />
 
-
                 <TouchableOpacity style={styles.continueButton}>
                     <Text style={styles.buttonText}>Continuar</Text>
                 </TouchableOpacity>
@@ -31,7 +30,6 @@ const LoginScreen = () => {
                 <Text style={styles.registerText}>
                     Não possui conta? <Text style={styles.registerLink}>Clique aqui</Text>
                 </Text>
-
 
                 <View style={styles.dividerContainer}>
                     <View style={styles.line} />
@@ -50,7 +48,6 @@ const LoginScreen = () => {
                 </TouchableOpacity>
             </View>
 
-
             <View style={styles.footerContainer}>
                 <Text style={styles.termsText}>
                     Ao utilizar, você concorda com os
@@ -59,7 +56,7 @@ const LoginScreen = () => {
                     <Text style={{ fontWeight: 'bold' }}> Política de Privacidade</Text>.
                 </Text>
             </View>
-        </View>
+        </ScrollView>
     );
 };
 
@@ -68,9 +65,12 @@ export default LoginScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        justifyContent: 'space-between',
         backgroundColor: '#fff',
+    },
+    scrollContainer: {
+        flexGrow: 1,
+        justifyContent: 'space-between',
+        padding: 20,
     },
     contentContainer: {
         flex: 1,
@@ -111,7 +111,6 @@ const styles = StyleSheet.create({
         color: '#555',
         marginBottom: 20,
     },
-
     input: {
         borderColor: '#ccc',
         borderWidth: 1,

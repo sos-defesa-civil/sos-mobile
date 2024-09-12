@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, TextInput, View, Image, Pressable, StyleSheet } from 'react-native';
+import { Text, TextInput, View, Image, Pressable, StyleSheet, ScrollView } from 'react-native';
  
 const InfoField = ({ title, value }: { title: string, value: string }) => {
     return (
@@ -16,32 +16,34 @@ const InfoField = ({ title, value }: { title: string, value: string }) => {
 const EditProfile = () => {
  
     return (
-        <View style={styles.container}>
-            <View style={styles.closeSection}>
-                <Image style={{ width: 28, height: 28 }} source={require('../../assets/images/close_icon.png')} />
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <View style={styles.container}>
+                <View style={styles.closeSection}>
+                    <Image style={{ width: 28, height: 28 }} source={require('../../assets/images/close_icon.png')} />
+                </View>
+                <View style={styles.userPicSection}>
+                    <Image source={require('../../assets/images/user_pic_icon.png')} style={{ width: 80, height: 80 }} />
+                    <Text style={{ fontFamily: 'SpaceGrotesk_500Medium', fontSize: 22 }}>Alterar Foto</Text>
+                </View>
+                <View style={styles.infoSection}>
+                    <InfoField title="Nome" value="Eduardo Henrique Marques" />
+                    <InfoField title="CPF" value="000.000.000-00" />
+                    <InfoField title="Endereço" value="Av. Comendador Leão, 999, Poço" />
+                    <InfoField title="Telefone" value="(82) 99999-9999" />
+                    <InfoField title="Email" value="eduardomarques@gmail.com" />
+                    <InfoField title="Data de Nascimento" value="31/03/2003" />
+                    <Pressable style={styles.confirmButton}>
+                        <Text style={{ fontFamily: 'SpaceGrotesk_700Bold', color: 'white' }}>SALVAR ALTERAÇÕES</Text>
+                    </Pressable>
+                </View>
+                <Text style={styles.termsText}>
+                    Ao utilizar, você concorda com os
+                    <Text style={{ fontWeight: 'bold' }}> Termos de Serviço </Text>
+                    e a
+                    <Text style={{ fontWeight: 'bold' }}> Política de Privacidade</Text>.
+                </Text>
             </View>
-            <View style={styles.userPicSection}>
-                <Image source={require('../../assets/images/user_pic_icon.png')} style={{ width: 80, height: 80 }} />
-                <Text style={{ fontFamily: 'SpaceGrotesk_500Medium', fontSize: 22 }}>Alterar Foto</Text>
-            </View>
-            <View style={styles.infoSection}>
-                <InfoField title="Nome" value="Eduardo Henrique Marques" />
-                <InfoField title="CPF" value="000.000.000-00" />
-                <InfoField title="Endereço" value="Av. Comendador Leão, 999, Poço" />
-                <InfoField title="Telefone" value="(82) 99999-9999" />
-                <InfoField title="Email" value="eduardomarques@gmail.com" />
-                <InfoField title="Data de Nascimento" value="31/03/2003" />
-                <Pressable style={styles.confirmButton}>
-                    <Text style={{ fontFamily: 'SpaceGrotesk_700Bold', color: 'white' }}>SALVAR ALTERAÇÕES</Text>
-                </Pressable>
-            </View>
-            <Text style={styles.termsText}>
-                Ao utilizar, você concorda com os
-                <Text style={{ fontWeight: 'bold' }}> Termos de Serviço </Text>
-                e a
-                <Text style={{ fontWeight: 'bold' }}> Política de Privacidade</Text>.
-            </Text>
-        </View>
+        </ScrollView>
     );
 }
 
@@ -52,6 +54,11 @@ const styles = StyleSheet.create({
         flex: 1,
         margin: 16,
         justifyContent: 'space-between',
+    },
+    scrollContainer: {
+        flexGrow: 1,
+        justifyContent: 'space-between',
+        padding: 20,
     },
     closeSection: {
         marginTop: 24,
