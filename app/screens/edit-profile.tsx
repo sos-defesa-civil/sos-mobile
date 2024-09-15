@@ -26,11 +26,11 @@ const EditProfile = () => {
                     <Text style={{ fontFamily: 'SpaceGrotesk_500Medium', fontSize: 22 }}>Alterar Foto</Text>
                 </View>
                 <View style={styles.infoSection}>
-                    <InfoField title="Nome" value="Eduardo Henrique Marques" />
+                    <InfoField title="Nome" value="Fulano Ciclano da Silva" />
                     <InfoField title="CPF" value="000.000.000-00" />
                     <InfoField title="Endereço" value="Av. Comendador Leão, 999, Poço" />
                     <InfoField title="Telefone" value="(82) 99999-9999" />
-                    <InfoField title="Email" value="eduardomarques@gmail.com" />
+                    <InfoField title="Email" value="fulanociclano@gmail.com" />
                     <InfoField title="Data de Nascimento" value="31/03/2003" />
                     <Pressable style={styles.confirmButton}>
                         <Text style={{ fontFamily: 'SpaceGrotesk_700Bold', color: 'white' }}>SALVAR ALTERAÇÕES</Text>
