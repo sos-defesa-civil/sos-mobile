@@ -7,6 +7,7 @@ import { useRouter } from "expo-router";
 
 import ConfirmOccurrenceRecord from "../overlays/confirmOccurrenceRecord";
 import MapOccurrenceOverlay from "../overlays/mapOccurrenceOverlay";
+import ReportOcurrenceOverlay from "../overlays/reportOccurrence";
 
 const fabShadow = {
     shadowColor: "#000",
@@ -25,6 +26,7 @@ export default function App() {
     const [showRainOverlay, setShowRainOverlay] = useState(false);
     const [showFireOverlay, setShowFireOverlay] = useState(false);
     const [confirmOccurence, setConfirmOccurence] = useState(false);
+    const [reportOverlay, setReportOverlay] = useState(false);
 
     const initialRegion = {
         latitude: -9.6498, // Approximate latitude for Maceió, Brazil
@@ -65,7 +67,7 @@ export default function App() {
                     <FontAwesome name="exclamation-triangle" size={34} color="#828181" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navBarItem}>
-                    <FontAwesome name="file-text" size={34} color="#828181" onPress={() => setConfirmOccurence(true)}/>
+                    <FontAwesome name="file-text" size={34} color="#828181" onPress={() => setReportOverlay(true)}/>
                 </TouchableOpacity>
             </View>
 
@@ -83,6 +85,11 @@ export default function App() {
                 icon={require("../../assets/images/fire_square.png")}
                 onClose={() => setShowFireOverlay(false)}
                 visible={showFireOverlay}
+            />
+
+            <ReportOcurrenceOverlay 
+                visible={reportOverlay}
+                onClose={() => setReportOverlay(false)} 
             />
 
             <ConfirmOccurrenceRecord
