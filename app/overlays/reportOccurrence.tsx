@@ -29,7 +29,7 @@ const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onAddMarker,
         "https://maps.googleapis.com/maps/api/place/textsearch/json";
     const input = searchText.trim();
     const location = `${-9.6498},${-35.7089}&radius=2000`;
-    const url = `${googleApisUrl}?input=${input}&inputtype=textquery&locationbias=circle:2000@${location}&key=`;
+    const url = `${googleApisUrl}?input=${input}&inputtype=textquery&locationbias=circle:2000@${location}&key=${process.env.EXPO_PUBLIC_GOOGLE_API_KEY}`;
 
     try {
         const resp = await fetch(url);
