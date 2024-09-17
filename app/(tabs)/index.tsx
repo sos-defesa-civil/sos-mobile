@@ -8,9 +8,7 @@ import { useRouter } from "expo-router";
 import ConfirmOccurrenceRecord from "../overlays/confirmOccurrenceRecord";
 import MapOccurrenceOverlay from "../overlays/mapOccurrenceOverlay";
 import ReportOcurrenceOverlay from "../overlays/reportOccurrence";
-import { SearchBar } from "react-native-screens";
 
-const GOOGLE_API_KEY = "AIzaSyAwoHaxO44EOUyyWYKIJTfIxpW6qepyb74";
 const mapRef = useRef<MapView>(null);
 
 const fabShadow = {
@@ -112,12 +110,6 @@ export default function App() {
                 visible={reportOverlay}
                 onAddMarker={handleAddMarker}
                 onClose={() => setReportOverlay(false)} 
-            />
-
-            <ConfirmOccurrenceRecord
-                visible={confirmOccurence}
-                onConfirm={() => setConfirmOccurence(false)}
-                onCancel={() => setConfirmOccurence(false)}
             />
 
             <StatusBar style="auto" />

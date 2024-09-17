@@ -5,9 +5,12 @@ interface ConfirmOccurrenceRecordProps {
     visible: boolean;
     onConfirm: () => void;
     onCancel: () => void;
+    address: string;
+    occurrenceType: string;
+    description?: string;
 }
 
-const ConfirmOccurrenceRecord: React.FC<ConfirmOccurrenceRecordProps> = ({ visible, onConfirm, onCancel }) => {
+const ConfirmOccurrenceRecord: React.FC<ConfirmOccurrenceRecordProps> = ({ visible, onConfirm, onCancel, address, occurrenceType, description }) => {
     return (
         <Modal
             animationType="slide"
@@ -27,22 +30,28 @@ const ConfirmOccurrenceRecord: React.FC<ConfirmOccurrenceRecordProps> = ({ visib
                     <View style={styles.infoSection}>
                         <Text style={styles.subtitle}>Endereço:</Text>
                         <View style={styles.infoField}>
-                            <Text style={styles.infoText}>Av. Fernandes Lima</Text>
+                            <Text style={styles.infoText}>{address || 'Endereço não informado'}</Text>
                         </View>
                     </View>
 
                     <View style={styles.infoSection}>
                         <Text style={styles.subtitle}>Tipo de Ocorrência:</Text>
                         <View style={styles.infoField}>
+                            {/* Trocar para exibir o ícone correspondente a ocorrência */}
                             <Image style={styles.disasterIcon} source={require('../../assets/images/rain_square.png')}/>
-                            <Text style={styles.infoText}>Chuvas Intensas</Text>
+                            <Text style={styles.infoText}>
+                                {occurrenceType === 'chuvas' ? 'Chuvas intensas' :
+                                 occurrenceType === 'incendio' ? 'Incêndio' :
+                                 occurrenceType === 'deslizamento' ? 'Deslizamento' : 
+                                 'Tipo não informado'}
+                            </Text>
                         </View>
                     </View>
 
                     <View style={styles.infoSection}>
                         <Text style={styles.subtitle}>Descrição e anexo</Text>
                         <View style={styles.infoField}>
-                            <Text style={styles.infoText}>Um tornado passou próximo...</Text>
+                            <Text style={styles.infoText}>{description || 'Nenhuma descrição fornecida'}</Text>
                         </View>
                         <View style={styles.infoField}>
                             <Text style={styles.infoText}>300820241330.JPEG</Text>

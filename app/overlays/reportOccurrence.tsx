@@ -17,6 +17,8 @@ const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onAddMarker,
   const [step, setStep] = useState(1); 
   const [selectedOcurrence, setSelectedOcurrence] = useState('');
   const [searchText, setSearchText] = useState('');
+  const [description, setDescription] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const searchPlaces = async () => {
     if (!searchText.trim().length) return;
@@ -27,7 +29,7 @@ const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onAddMarker,
         "https://maps.googleapis.com/maps/api/place/textsearch/json";
     const input = searchText.trim();
     const location = `${-9.6498},${-35.7089}&radius=2000`;
-    const url = `${googleApisUrl}?input=${input}&inputtype=textquery&locationbias=circle:2000@${location}&key=AIzaSyAwoHaxO44EOUyyWYKIJTfIxpW6qepyb74`;
+    const url = `${googleApisUrl}?input=${input}&inputtype=textquery&locationbias=circle:2000@${location}&key=`;
 
     try {
         const resp = await fetch(url);
@@ -63,6 +65,11 @@ const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onAddMarker,
     if (step > 1) {
       setStep(step - 1);
     }
+  };
+
+  const handleConfirm = () => {
+    setShowConfirmModal(false);
+    onClose();
   };
 
   if (!visible) {
@@ -146,7 +153,10 @@ const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onAddMarker,
             Icon={() => <Ionicons name="chevron-down" size={24} color="gray" />}
           />
 
-          <TextInput style={styles.input} placeholder="Escreva aqui a descrição (opcional)" />
+          <TextInput style={styles.input} 
+            placeholder="Escreva aqui a descrição (opcional)"
+            onChangeText={setDescription}
+          />
           <TouchableOpacity style={styles.button} onPress={nextStep}>
             <Text style={styles.buttonText}>Confirmar Descrição</Text>
           </TouchableOpacity>
@@ -156,11 +166,24 @@ const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onAddMarker,
         <View style={styles.stepContent}>
           <Text style={styles.stepTitle}>Anexo de Mídia (opc.)</Text>
           <TextInput style={styles.input} placeholder="Anexe uma imagem da ocorrência" />
-          <TouchableOpacity style={styles.button} onPress={onClose}>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={() => setShowConfirmModal(true)}
+            >
             <Text style={styles.buttonText}>Registrar Ocorrência</Text>
           </TouchableOpacity>
         </View>
       )}
+
+      <ConfirmOccurrenceRecord 
+        visible={showConfirmModal} 
+        onConfirm={handleConfirm} 
+        onCancel={() => setShowConfirmModal(false)}
+        address={searchText}
+        occurrenceType={selectedOcurrence}
+        description={description}
+        />
+
     </View>
   );
 };
