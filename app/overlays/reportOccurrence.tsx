@@ -3,24 +3,55 @@ import React, { useState } from "react";
 import { TouchableOpacity, View, Text, TextInput, StyleSheet, Dimensions } from "react-native";
 import RNPickerSelect from 'react-native-picker-select';
 import ConfirmOccurrenceRecord from "./confirmOccurrenceRecord";
+import { LatLng } from "react-native-maps";
 
 const { width: screenWidth } = Dimensions.get("window");
 
 interface OverlayProps {
   visible: boolean;
+  onAddMarker: (coords: LatLng) => void;
   onClose: () => void;
 }
 
-const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onClose }) => {
+const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onAddMarker, onClose }) => {
   const [step, setStep] = useState(1); 
   const [selectedOcurrence, setSelectedOcurrence] = useState('');
+  const [searchText, setSearchText] = useState('');
+
+  const searchPlaces = async () => {
+    if (!searchText.trim().length) return;
+
+    console.log("Searching for places...");
+
+    const googleApisUrl = 
+        "https://maps.googleapis.com/maps/api/place/textsearch/json";
+    const input = searchText.trim();
+    const location = `${-9.6498},${-35.7089}&radius=2000`;
+    const url = `${googleApisUrl}?input=${input}&inputtype=textquery&locationbias=circle:2000@${location}&key=AIzaSyAwoHaxO44EOUyyWYKIJTfIxpW6qepyb74`;
+
+    try {
+        const resp = await fetch(url);
+        const json = await resp.json();
+
+        if (json && json.results) {
+            const place = json.results[0];
+            const location = place.geometry.location;
+            const coords: LatLng[] = []
+
+            coords.push({ latitude: location.lat, longitude: location.lng });
+            console.log('Coordenadas: ', coords);
+            onAddMarker(coords[0]);
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
 
   const occurrences = [
     { label: 'Chuvas Intensas', value: 'chuvas', icon: 'rainy-outline' },
     { label: 'Incêndio', value: 'incendio', icon: 'flame-outline' },
     { label: 'Deslizamento', value: 'deslizamento', icon: 'earth-outline' },
   ];
-
 
   const nextStep = () => {
     if (step < 3) {
@@ -66,8 +97,8 @@ const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onClose }) =
 
       {step === 1 && (
         <View style={styles.stepContent}>
-          <Text style={styles.titleStepOne}>Selecione o local no mapa</Text>
-          <Text style={styles.stepSubtitle}>ou</Text>
+          {/* <Text style={styles.titleStepOne}>Selecione o local no mapa</Text>
+          <Text style={styles.stepSubtitle}>ou</Text> */}
           <View style={styles.searchContainer}>
 
             <Ionicons name="search" size={20} color="#A68C70" style={styles.searchIcon} />
@@ -75,10 +106,11 @@ const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onClose }) =
               style={styles.inputWithIcon}
               placeholder="Digite o Endereço"
               placeholderTextColor="#A68C70"
+              onChangeText={setSearchText}
             />
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={nextStep}>
+            <TouchableOpacity style={styles.button} onPress={() => { nextStep(); searchPlaces(); }}>
             <Text style={styles.buttonText}>Confirmar Local</Text>
           </TouchableOpacity>
         </View>
@@ -108,6 +140,7 @@ const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onClose }) =
               inputIOS: styles.inputSelect,
               inputAndroid: styles.inputSelect,
               iconContainer: styles.iconContainer,
+              placeholder: styles.placeholder,
             }}
             useNativeAndroidPickerStyle={false}
             Icon={() => <Ionicons name="chevron-down" size={24} color="gray" />}
@@ -260,6 +293,9 @@ const styles = StyleSheet.create({
   iconContainer: {
     top: 12, 
     right: 10, 
+  },
+  placeholder: {
+    color: '#A68C70',
   },
 });
 

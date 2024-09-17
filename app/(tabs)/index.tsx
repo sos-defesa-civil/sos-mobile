@@ -1,13 +1,17 @@
-import React, { useState } from "react";
-import { StyleSheet, View, TouchableOpacity, Text, Animated, Image } from "react-native";
+import React, { useRef, useState } from "react";
+import { StyleSheet, View, TouchableOpacity, Text, Animated, Image, TextInput } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"; // Import MapView and Marker
+import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from "react-native-maps"; // Import MapView and Marker
 import { useRouter } from "expo-router";
 
 import ConfirmOccurrenceRecord from "../overlays/confirmOccurrenceRecord";
 import MapOccurrenceOverlay from "../overlays/mapOccurrenceOverlay";
 import ReportOcurrenceOverlay from "../overlays/reportOccurrence";
+import { SearchBar } from "react-native-screens";
+
+const GOOGLE_API_KEY = "AIzaSyAwoHaxO44EOUyyWYKIJTfIxpW6qepyb74";
+const mapRef = useRef<MapView>(null);
 
 const fabShadow = {
     shadowColor: "#000",
@@ -27,7 +31,7 @@ export default function App() {
     const [showFireOverlay, setShowFireOverlay] = useState(false);
     const [confirmOccurence, setConfirmOccurence] = useState(false);
     const [reportOverlay, setReportOverlay] = useState(false);
-
+    const [coords, setCoords] = useState<LatLng[]>([]);
     const initialRegion = {
         latitude: -9.6498, // Approximate latitude for Maceió, Brazil
         longitude: -35.7089, // Approximate longitude for Maceió, Brazil
@@ -35,9 +39,20 @@ export default function App() {
         longitudeDelta: 0.0421,
     };
 
+    const handleAddMarker = (newCoords: LatLng) => {
+        console.log("Adding marker at: ", newCoords);
+        setCoords([...coords, newCoords]);
+        mapRef.current?.animateToRegion({
+            latitude: newCoords.latitude,
+            longitude: newCoords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+        }, 1000);
+    };
+
     return (
         <View style={styles.container}>
-            <MapView provider={PROVIDER_GOOGLE} style={styles.mapBackground} initialRegion={initialRegion}>
+            <MapView ref={mapRef} provider={PROVIDER_GOOGLE} style={styles.mapBackground} initialRegion={initialRegion}>
                 <Marker coordinate={{ latitude: -9.6398, longitude: -35.7189 }} onPress={() => setShowRainOverlay(true)}>
                     <Image source={require("../../assets/images/rain.png")} style={{ width: 30, height: 30 }} />
                 </Marker>
@@ -45,6 +60,12 @@ export default function App() {
                 <Marker coordinate={{ latitude: -9.6598, longitude: -35.6989 }} onPress={() => setShowFireOverlay(true)}>
                     <Image source={require("../../assets/images/fire.png")} style={{ width: 30, height: 30 }} />
                 </Marker>
+
+                {coords.map((coord, index) => (
+                    <Marker key={index} coordinate={coord}>
+                        <Image source={require("../../assets/images/fire.png")} style={{ width: 30, height: 30 }} />
+                    </Marker>
+                ))}
             </MapView>
 
             <TouchableOpacity style={[styles.centerMapButton, fabShadow]}>
@@ -89,6 +110,7 @@ export default function App() {
 
             <ReportOcurrenceOverlay 
                 visible={reportOverlay}
+                onAddMarker={handleAddMarker}
                 onClose={() => setReportOverlay(false)} 
             />
 
@@ -152,5 +174,35 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         padding: 14,
         paddingHorizontal: 15,
+    },
+    searchContainer:{
+        position: "absolute",
+        width: '90%',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderBlockColor: '#858585',
+        backgroundColor: 'white',
+        padding: 14,
+        paddingHorizontal: 15,
+        alignSelf: 'center',
+        marginTop: 80,
+        gap: 16,
+    },
+    searchTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    searchButton: {
+        padding: 10,
+        alignSelf: 'center',
+        alignItems: 'center',
+        borderRadius: 8,
+        width: '60%',
+        backgroundColor: '#FAA74A',
+    },
+    searchInput: {
+        padding: 8,
+        borderRadius: 8,
+        borderWidth: 1,
     },
 });
