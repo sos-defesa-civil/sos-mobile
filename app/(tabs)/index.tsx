@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { StyleSheet, View, TouchableOpacity, Text, Animated, Image, TextInput } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
@@ -8,7 +8,6 @@ import { useRouter } from "expo-router";
 import ConfirmOccurrenceRecord from "../overlays/confirmOccurrenceRecord";
 import MapOccurrenceOverlay from "../overlays/mapOccurrenceOverlay";
 import ReportOcurrenceOverlay from "../overlays/reportOccurrence";
-
 
 const fabShadow = {
     shadowColor: "#000",
@@ -21,6 +20,18 @@ const fabShadow = {
     elevation: 5,
 };
 
+interface Occurrence {
+    id: number;
+    tipo: string;
+    bairro: string;
+    descricao: string;
+    data_registro: string;
+    ultima_atualizacao: string;
+    user_id: number;
+    latitude: number;
+    longitude: number;
+}
+
 export default function App() {
     const router = useRouter();
     const mapRef = useRef<MapView>(null);
@@ -30,11 +41,26 @@ export default function App() {
     const [confirmOccurence, setConfirmOccurence] = useState(false);
     const [reportOverlay, setReportOverlay] = useState(false);
     const [coords, setCoords] = useState<LatLng[]>([]);
+    const [occurrences, setOccurrences] = useState<Occurrence[]>([]);
     const initialRegion = {
         latitude: -9.6498, // Approximate latitude for Maceió, Brazil
         longitude: -35.7089, // Approximate longitude for Maceió, Brazil
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
+    };
+
+    useEffect(() => {
+        fetchOccurrences();
+    }, []);
+
+    const fetchOccurrences = async () => {
+        try {
+            const response = await fetch("http://192.168.0.9:8000/api/ocorrencias/list/?limit=1000&offset=0");
+            const data = await response.json();
+            setOccurrences(data);
+        } catch (error) {
+            console.error('Error fetching occurrences:', error);
+        }
     };
 
     const handleAddMarker = (newCoords: LatLng) => {
@@ -51,14 +77,25 @@ export default function App() {
     return (
         <View style={styles.container}>
             <MapView ref={mapRef} provider={PROVIDER_GOOGLE} style={styles.mapBackground} initialRegion={initialRegion}>
-                <Marker coordinate={{ latitude: -9.6398, longitude: -35.7189 }} onPress={() => setShowRainOverlay(true)}>
-                    <Image source={require("../../assets/images/rain.png")} style={{ width: 30, height: 30 }} />
-                </Marker>
-
-                <Marker coordinate={{ latitude: -9.6598, longitude: -35.6989 }} onPress={() => setShowFireOverlay(true)}>
-                    <Image source={require("../../assets/images/fire.png")} style={{ width: 30, height: 30 }} />
-                </Marker>
-
+                {occurrences.map((occurrence) => (
+                    <Marker 
+                        key={occurrence.id} 
+                        coordinate={{ latitude: occurrence.latitude, longitude: occurrence.longitude }}
+                        onPress={() => {
+                            // You can implement a function to show occurrence details here
+                            console.log('Occurrence pressed:', occurrence);
+                        }}
+                    >
+                        <Image 
+                            source={
+                                occurrence.tipo === 'tipo1' 
+                                    ? require("../../assets/images/rain.png")
+                                    : require("../../assets/images/fire.png")
+                            } 
+                            style={{ width: 30, height: 30 }} 
+                        />
+                    </Marker>
+                ))}
                 {coords.map((coord, index) => (
                     <Marker key={index} coordinate={coord}>
                         <Image source={require("../../assets/images/fire.png")} style={{ width: 30, height: 30 }} />

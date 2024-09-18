@@ -19,6 +19,7 @@ const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onAddMarker,
   const [searchText, setSearchText] = useState('');
   const [description, setDescription] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [coords, setCoords] = useState<LatLng>();
 
   const searchPlaces = async () => {
     if (!searchText.trim().length) return;
@@ -43,6 +44,7 @@ const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onAddMarker,
             coords.push({ latitude: location.lat, longitude: location.lng });
             console.log('Coordenadas: ', coords);
             onAddMarker(coords[0]);
+            setCoords({ latitude: location.lat, longitude: location.lng });
         }
     } catch (error) {
         console.error(error);
@@ -182,6 +184,8 @@ const ReportOccurrenceOverlay: React.FC<OverlayProps> = ({ visible, onAddMarker,
         address={searchText}
         occurrenceType={selectedOcurrence}
         description={description}
+        latitude={coords?.latitude}
+        longitude={coords?.longitude}
         />
 
     </View>

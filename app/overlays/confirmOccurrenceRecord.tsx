@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Modal, TouchableOpacity, Pressable } from 'react-native';
+import { View, Text, Image, StyleSheet, Modal, TouchableOpacity, Pressable, Alert } from 'react-native';
 
 interface ConfirmOccurrenceRecordProps {
     visible: boolean;
@@ -8,9 +8,53 @@ interface ConfirmOccurrenceRecordProps {
     address: string;
     occurrenceType: string;
     description?: string;
+    latitude?: number;
+    longitude?: number;
 }
 
-const ConfirmOccurrenceRecord: React.FC<ConfirmOccurrenceRecordProps> = ({ visible, onConfirm, onCancel, address, occurrenceType, description }) => {
+const ConfirmOccurrenceRecord: React.FC<ConfirmOccurrenceRecordProps> = ({ 
+    visible, 
+    onConfirm, 
+    onCancel, 
+    address, 
+    occurrenceType, 
+    description,
+    latitude,
+    longitude
+}) => {
+    const handleConfirm = async () => {
+        try {
+            const response = await fetch('http://192.168.0.9:8000/api/ocorrencia/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    tipo: occurrenceType === 'chuvas' ? 'tipo1' : 'tipo2',
+                    bairro: address,
+                    descricao: description || 'No description provided',
+                    data_registro: new Date().toISOString(),
+                    ultima_atualizacao: new Date().toISOString(),
+                    user_id: 2, // You might want to replace this with the actual user ID
+                    latitude: latitude,
+                    longitude: longitude
+                }),
+            });
+
+            if (response.ok) {
+                Alert.alert('Success', 'Occurrence recorded successfully');
+                onConfirm();
+            } else {
+                const errorResponse = await response.json();
+                console.error('Error response:', errorResponse);
+                throw new Error('Failed to record occurrence');
+            }
+        } catch (error) {
+            console.error('Error recording occurrence:', error);
+            Alert.alert('Error', 'Failed to record occurrence. Please try again.');
+        }
+    };
+
     return (
         <Modal
             animationType="slide"
@@ -37,8 +81,11 @@ const ConfirmOccurrenceRecord: React.FC<ConfirmOccurrenceRecordProps> = ({ visib
                     <View style={styles.infoSection}>
                         <Text style={styles.subtitle}>Tipo de Ocorrência:</Text>
                         <View style={styles.infoField}>
-                            {/* Trocar para exibir o ícone correspondente a ocorrência */}
-                            <Image style={styles.disasterIcon} source={require('../../assets/images/rain_square.png')}/>
+                            <Image style={styles.disasterIcon} source={
+                                occurrenceType === 'chuvas' 
+                                    ? require('../../assets/images/rain_square.png')
+                                    : require('../../assets/images/fire_square.png')
+                            }/>
                             <Text style={styles.infoText}>
                                 {occurrenceType === 'chuvas' ? 'Chuvas intensas' :
                                  occurrenceType === 'incendio' ? 'Incêndio' :
@@ -57,7 +104,7 @@ const ConfirmOccurrenceRecord: React.FC<ConfirmOccurrenceRecordProps> = ({ visib
                             <Text style={styles.infoText}>300820241330.JPEG</Text>
                         </View>
                     </View>
-                    <TouchableOpacity style={styles.buttonContainer} onPress={onConfirm}>
+                    <TouchableOpacity style={styles.buttonContainer} onPress={handleConfirm}>
                         <Text style={styles.buttonText}>Registrar Ocorrência</Text>
                     </TouchableOpacity>
                 </View>

@@ -4,7 +4,19 @@ import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState, useRef, useEffect } from "react";
 
-const AlertItem = ({ title, description, icon }: { title: string; description: string; icon: any }) => {
+interface Occurrence {
+    id: number;
+    tipo: string;
+    bairro: string;
+    descricao: string;
+    data_registro: string;
+    ultima_atualizacao: string;
+    user_id: number;
+    latitude: number;
+    longitude: number;
+}
+
+const AlertItem = ({ occurrence }: { occurrence: Occurrence }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const animatedHeight = useRef(new Animated.Value(0)).current;
     const animatedRotation = useRef(new Animated.Value(0)).current;
@@ -37,10 +49,17 @@ const AlertItem = ({ title, description, icon }: { title: string; description: s
     return (
         <View style={styles.alertItem}>
             <Pressable onPress={() => setIsExpanded(!isExpanded)} style={styles.alertHeader}>
-                <Image source={icon} style={styles.alertIcon} />
+                <Image 
+                    source={
+                        occurrence.tipo === 'tipo1' 
+                            ? require("../../assets/images/rain_square.png")
+                            : require("../../assets/images/fire_square.png")
+                    } 
+                    style={styles.alertIcon} 
+                />
                 <View style={styles.alertContent}>
-                    <Text style={styles.alertTitle}>{title}</Text>
-                    <Text style={styles.alertDescription}>{description}</Text>
+                    <Text style={styles.alertTitle}>{occurrence.bairro}</Text>
+                    <Text style={styles.alertDescription}>{occurrence.descricao}</Text>
                 </View>
                 <Animated.View style={{ transform: [{ rotateZ }] }}>
                     <Ionicons name="chevron-down" size={24} color="#000" />
@@ -74,6 +93,21 @@ const FilterButton = ({ title }: { title: string }) => (
 
 export default function AlertsScreen() {
     const router = useRouter();
+    const [occurrences, setOccurrences] = useState<Occurrence[]>([]);
+
+    useEffect(() => {
+        fetchOccurrences();
+    }, []);
+
+    const fetchOccurrences = async () => {
+        try {
+            const response = await fetch("http://192.168.0.9:8000/api/ocorrencias/list/");
+            const data = await response.json();
+            setOccurrences(data);
+        } catch (error) {
+            console.error('Error fetching occurrences:', error);
+        }
+    };
 
     return (
         <View style={{ backgroundColor: "#272c6b", flex: 1 }}>
@@ -106,14 +140,9 @@ export default function AlertsScreen() {
                 </View>
 
                 <ScrollView style={styles.alertList}>
-                    <AlertItem title="Av. Fernandes Lima" description="Incêndio na Avenida Fernandes Lima, próximo ao Shopping Pátio Maceió." icon={require("../../assets/images/fire_square.png")} />
-                    <AlertItem title="Rua Sá e Albuquerque" description="Tornado na Rua Sá e Albuquerque, região do Jaraguá." icon={require("../../assets/images/tornado_square.png")} />
-                    <AlertItem title="Av. C. Gustavo Paiva" description="Alagamento na Avenida Comendador Gustavo Paiva, próximo ao Maceió Shopping." icon={require("../../assets/images/rain_square.png")} />
-                    <AlertItem title="Av. Durval de Góes Monteiro" description="Incêndio na Avenida Durval de Góes Monteiro, próximo à praia de Jatiúca." icon={require("../../assets/images/fire_square.png")} />
-                    <AlertItem title="Rua Jangadeiros Alagoanos" description="Tornado na Rua Jangadeiros Alagoanos, região da Ponta Verde." icon={require("../../assets/images/tornado_square.png")} />
-                    <AlertItem title="Av. Álvaro Otacílio" description="Alagamento na Avenida Álvaro Otacílio, orla da Ponta Verde." icon={require("../../assets/images/rain_square.png")} />
-                    <AlertItem title="Rua Jangadeiros Alagoanos" description="Tornado na Rua Jangadeiros Alagoanos, região da Ponta Verde." icon={require("../../assets/images/tornado_square.png")} />
-                    <AlertItem title="Rua Antônio Vieira Filho" description="Incêndio na Rua Antônio Vieira Filho, próximo ao Shopping Pátio Maceió." icon={require("../../assets/images/fire_square.png")} />
+                    {occurrences.map((occurrence) => (
+                        <AlertItem key={occurrence.id} occurrence={occurrence} />
+                    ))}
                 </ScrollView>
             </View>
             <View style={styles.bottomNavBar}>
