@@ -9,7 +9,6 @@ import ConfirmOccurrenceRecord from "../overlays/confirmOccurrenceRecord";
 import MapOccurrenceOverlay from "../overlays/mapOccurrenceOverlay";
 import ReportOcurrenceOverlay from "../overlays/reportOccurrence";
 
-const mapRef = useRef<MapView>(null);
 
 const fabShadow = {
     shadowColor: "#000",
@@ -24,6 +23,7 @@ const fabShadow = {
 
 export default function App() {
     const router = useRouter();
+    const mapRef = useRef<MapView>(null);
 
     const [showRainOverlay, setShowRainOverlay] = useState(false);
     const [showFireOverlay, setShowFireOverlay] = useState(false);
